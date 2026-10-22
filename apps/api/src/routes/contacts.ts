@@ -34,7 +34,7 @@ contactsRoutes.patch('/:id', route(async (req, res) => {
   const existing = await query('SELECT * FROM contacts WHERE id=$1 AND organization_id=$2', [req.params.id, org]);
   if (!existing.rowCount) throw new HttpError(404, 'Contato não encontrado');
   const merged = { ...existing.rows[0], ...fields };
-  const phone = normalizePhone(merged.phone);
+  const phone = normalizePhone(typeof merged.phone === 'string' ? merged.phone : '');
   if (phone.length < 10 || phone.length > 15) throw new HttpError(400, 'Telefone inválido');
   try {
     const result = await query(`UPDATE contacts SET name=$3, phone=$4, email=$5, tags=$6, opted_in=$7, archived=$8 WHERE id=$1 AND organization_id=$2 RETURNING *`,
